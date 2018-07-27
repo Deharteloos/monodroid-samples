@@ -1,14 +1,14 @@
-﻿namespace SimpleMapDemo
+﻿using Android.App;
+using Android.Content;
+
+namespace SimpleMapDemo
 {
     using System;
 
-    using Android.App;
-    using Android.Content;
-
     /// <summary>
-    /// This class holds meta-data about the various activities that are used in this application.
+    ///     This class holds meta-data about the various activities that are used in this application.
     /// </summary>
-    internal class SampleActivity
+    class SampleActivity
     {
         public SampleActivity(int titleResourceId, int descriptionId, Type activityToLaunch)
         {
@@ -17,13 +17,13 @@
             DescriptionResource = descriptionId;
         }
 
-        public Type ActivityToLaunch { get; private set; }
-        public int DescriptionResource { get; private set; }
-        public int TitleResource { get; private set; }
+        public Type ActivityToLaunch { get; }
+        public int DescriptionResource { get; }
+        public int TitleResource { get; }
 
         public void Start(Activity context)
         {
-            Intent i = new Intent(context, ActivityToLaunch);
+            var i = new Intent(context, ActivityToLaunch);
             context.StartActivity(i);
         }
     }
