@@ -8,9 +8,9 @@ namespace SimpleMapDemo
     /// <summary>
     ///     This class holds meta-data about the various activities that are used in this application.
     /// </summary>
-    class SampleActivity
+    class SampleMetaData
     {
-        public SampleActivity(int titleResourceId, int descriptionId, Type activityToLaunch)
+        public SampleMetaData(int titleResourceId, int descriptionId, Type activityToLaunch)
         {
             ActivityToLaunch = activityToLaunch;
             TitleResource = titleResourceId;

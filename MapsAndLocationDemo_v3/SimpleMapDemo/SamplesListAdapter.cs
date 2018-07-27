@@ -7,27 +7,20 @@ using Android.Widget;
 
 namespace SimpleMapDemo
 {
-    class SimpleMapDemoActivityAdapter : BaseAdapter<SampleActivity>
+    class SamplesListAdapter : BaseAdapter<SampleMetaData>
     {
-        readonly List<SampleActivity> _activities;
+        readonly List<SampleMetaData> _activities;
         readonly Context _context;
 
-        public SimpleMapDemoActivityAdapter(Context context, IEnumerable<SampleActivity> sampleActivities)
+        public SamplesListAdapter(Context context, IEnumerable<SampleMetaData> sampleActivities)
         {
             _context = context;
-            if (sampleActivities == null)
-            {
-                _activities = new List<SampleActivity>(0);
-            }
-            else
-            {
-                _activities = sampleActivities.ToList();
-            }
+            _activities = sampleActivities == null ? new List<SampleMetaData>(0) : sampleActivities.ToList();
         }
 
         public override int Count => _activities.Count;
 
-        public override SampleActivity this[int position] => _activities[position];
+        public override SampleMetaData this[int position] => _activities[position];
 
         public override long GetItemId(int position)
         {

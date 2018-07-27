@@ -1,26 +1,54 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using Android.App;
 using Android.Content;
 using Android.Gms.Common;
-using Android.Net;
 using Android.OS;
+using Android.Support.V7.App;
 using Android.Util;
-using Android.Views;
 using Android.Widget;
+
+using Uri = Android.Net.Uri;
 
 namespace SimpleMapDemo
 {
     using AndroidUri = Uri;
 
     [Activity(Label = "@string/app_name", MainLauncher = true, Icon = "@drawable/icon")]
-    public class MainActivity : ListActivity
+    public class MainActivity : AppCompatActivity
     {
         public static readonly int InstallGooglePlayServicesId = 1000;
         public static readonly string Tag = "XamarinMapDemo";
 
-        List<SampleActivity> _activities;
-        bool _isGooglePlayServicesInstalled;
+        static readonly List<SampleMetaData> SampleMetaDataList = new List<SampleMetaData>
+                                                                  {
+                                                                      new SampleMetaData(Resource.String.mapsAppText,
+                                                                                         Resource.String.mapsAppTextDescription, null),
+                                                                      new SampleMetaData(Resource.String.activity_label_axml,
+                                                                                         Resource.String.activity_description_axml,
+                                                                                         typeof(BasicDemoActivity)),
+                                                                      new SampleMetaData(Resource.String.activity_label_mapwithmarkers,
+                                                                                         Resource.String.activity_description_mapwithmarkers,
+                                                                                         typeof(MapWithMarkersActivity)),
+                                                                      new SampleMetaData(Resource.String.activity_label_mapwithoverlays,
+                                                                                         Resource.String.activity_description_mapwithoverlays,
+                                                                                         typeof(MapWithOverlaysActivity))
+                                                                  };
+
+        bool isGooglePlayServicesInstalled;
+        SamplesListAdapter listAdapter;
+        ListView listView;
+
+        protected override void OnCreate(Bundle bundle)
+        {
+            base.OnCreate(bundle);
+            SetContentView(Resource.Layout.MainActivity);
+            isGooglePlayServicesInstalled = TestIfGooglePlayServicesIsInstalled();
+
+            InitializeListView();
+        }
+
 
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {
@@ -28,7 +56,7 @@ namespace SimpleMapDemo
             {
                 case Result.Ok:
                     // Try again.
-                    _isGooglePlayServicesInstalled = true;
+                    isGooglePlayServicesInstalled = true;
                     break;
 
                 default:
@@ -37,49 +65,48 @@ namespace SimpleMapDemo
             }
         }
 
-        protected override void OnCreate(Bundle bundle)
+
+        protected override void OnResume()
         {
-            base.OnCreate(bundle);
-            _isGooglePlayServicesInstalled = TestIfGooglePlayServicesIsInstalled();
-            InitializeListView();
+            base.OnResume();
+            listView.Click += SampleSelected;
         }
 
-        protected override void OnListItemClick(ListView l, View v, int position, long id)
+        void SampleSelected(object sender, EventArgs e)
         {
-            if (position == 0)
-            {
-                var geoUri = AndroidUri.Parse("geo:42.374260,-71.120824");
-                var mapIntent = new Intent(Intent.ActionView, geoUri);
-                StartActivity(mapIntent);
-                return;
-            }
-
-            var activity = _activities[position];
-            activity.Start(this);
+//            if (position == 0)
+//            {
+//                var geoUri = AndroidUri.Parse("geo:42.374260,-71.120824");
+//                var mapIntent = new Intent(Intent.ActionView, geoUri);
+//                StartActivity(mapIntent);
+//                return;
+//            }
+//
+//            var activity = SampleMetaDataList[position];
+//            activity.Start(this);
         }
+
+        protected override void OnPause()
+        {
+            listView.Click -= SampleSelected;
+            base.OnPause();
+        }
+
 
         void InitializeListView()
         {
-            if (_isGooglePlayServicesInstalled)
+            listView = FindViewById<ListView>(Resource.Id.list_view);
+            if (isGooglePlayServicesInstalled)
             {
-                _activities = new List<SampleActivity>
-                              {
-                                  new SampleActivity(Resource.String.mapsAppText, Resource.String.mapsAppTextDescription, null),
-                                  new SampleActivity(Resource.String.activity_label_axml, Resource.String.activity_description_axml,
-                                                     typeof(BasicDemoActivity)),
-                                  new SampleActivity(Resource.String.activity_label_mapwithmarkers,
-                                                     Resource.String.activity_description_mapwithmarkers, typeof(MapWithMarkersActivity)),
-                                  new SampleActivity(Resource.String.activity_label_mapwithoverlays,
-                                                     Resource.String.activity_description_mapwithoverlays, typeof(MapWithOverlaysActivity))
-                              };
-
-                ListAdapter = new SimpleMapDemoActivityAdapter(this, _activities);
+                listAdapter = new SamplesListAdapter(this, SampleMetaDataList);
             }
             else
             {
                 Log.Error("MainActivity", "Google Play Services is not installed");
-                ListAdapter = new SimpleMapDemoActivityAdapter(this, null);
+                listAdapter = new SamplesListAdapter(this, null);
             }
+
+//            listView.Adapter = listAdapter;
         }
 
         bool TestIfGooglePlayServicesIsInstalled()

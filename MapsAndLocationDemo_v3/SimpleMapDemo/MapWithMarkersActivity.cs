@@ -11,12 +11,12 @@ namespace SimpleMapDemo
     {
         static readonly LatLng Passchendaele = new LatLng(50.897778, 3.013333);
         static readonly LatLng VimyRidge = new LatLng(50.379444, 2.773611);
-        GoogleMap _map;
-        MapFragment _mapFragment;
+        GoogleMap googleMap;
+        MapFragment mapFragment;
 
         public void OnMapReady(GoogleMap map)
         {
-            _map = map;
+            googleMap = map;
         }
 
         protected override void OnCreate(Bundle bundle)
@@ -39,8 +39,8 @@ namespace SimpleMapDemo
 
         void InitMapFragment()
         {
-            _mapFragment = FragmentManager.FindFragmentByTag("map") as MapFragment;
-            if (_mapFragment == null)
+            mapFragment = FragmentManager.FindFragmentByTag("map") as MapFragment;
+            if (mapFragment == null)
             {
                 var mapOptions = new GoogleMapOptions()
                                  .InvokeMapType(GoogleMap.MapTypeSatellite)
@@ -48,12 +48,12 @@ namespace SimpleMapDemo
                                  .InvokeCompassEnabled(true);
 
                 var fragTx = FragmentManager.BeginTransaction();
-                _mapFragment = MapFragment.NewInstance(mapOptions);
-                fragTx.Add(Resource.Id.map, _mapFragment, "map");
+                mapFragment = MapFragment.NewInstance(mapOptions);
+                fragTx.Add(Resource.Id.map, mapFragment, "map");
                 fragTx.Commit();
             }
 
-            _mapFragment.GetMapAsync(this);
+            mapFragment.GetMapAsync(this);
         }
 
         void SetupAnimateToButton()
@@ -72,30 +72,30 @@ namespace SimpleMapDemo
                                        // AnimateCamera provides a smooth, animation effect while moving
                                        // the camera to the the position.
 
-                                       _map.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cameraPosition));
+                                       googleMap.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cameraPosition));
                                    };
         }
 
         void SetupMapIfNeeded()
         {
-            if (_map == null)
+            if (googleMap == null)
             {
-                if (_map != null)
+                if (googleMap != null)
                 {
                     var markerOpt1 = new MarkerOptions();
                     markerOpt1.SetPosition(VimyRidge);
                     markerOpt1.SetTitle("Vimy Ridge");
                     markerOpt1.InvokeIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueCyan));
-                    _map.AddMarker(markerOpt1);
+                    googleMap.AddMarker(markerOpt1);
 
                     var markerOpt2 = new MarkerOptions();
                     markerOpt2.SetPosition(Passchendaele);
                     markerOpt2.SetTitle("Passchendaele");
-                    _map.AddMarker(markerOpt2);
+                    googleMap.AddMarker(markerOpt2);
 
                     // We create an instance of CameraUpdate, and move the map to it.
                     var cameraUpdate = CameraUpdateFactory.NewLatLngZoom(VimyRidge, 15);
-                    _map.MoveCamera(cameraUpdate);
+                    googleMap.MoveCamera(cameraUpdate);
                 }
             }
         }
@@ -103,13 +103,13 @@ namespace SimpleMapDemo
         void SetupZoomInButton()
         {
             var zoomInButton = FindViewById<Button>(Resource.Id.zoomInButton);
-            zoomInButton.Click += (sender, e) => { _map.AnimateCamera(CameraUpdateFactory.ZoomIn()); };
+            zoomInButton.Click += (sender, e) => { googleMap.AnimateCamera(CameraUpdateFactory.ZoomIn()); };
         }
 
         void SetupZoomOutButton()
         {
             var zoomOutButton = FindViewById<Button>(Resource.Id.zoomOutButton);
-            zoomOutButton.Click += (sender, e) => { _map.AnimateCamera(CameraUpdateFactory.ZoomOut()); };
+            zoomOutButton.Click += (sender, e) => { googleMap.AnimateCamera(CameraUpdateFactory.ZoomOut()); };
         }
     }
 }
