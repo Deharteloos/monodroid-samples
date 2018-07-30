@@ -2,12 +2,13 @@ using Android.App;
 using Android.Gms.Maps;
 using Android.Gms.Maps.Model;
 using Android.OS;
+using Android.Support.V7.App;
 using Android.Widget;
 
 namespace SimpleMapDemo
 {
     [Activity(Label = "@string/activity_label_mapwithmarkers")]
-    public class MapWithMarkersActivity : Activity, IOnMapReadyCallback
+    public class MapWithMarkersActivity : AppCompatActivity, IOnMapReadyCallback
     {
         static readonly LatLng Passchendaele = new LatLng(50.897778, 3.013333);
         static readonly LatLng VimyRidge = new LatLng(50.379444, 2.773611);
@@ -83,14 +84,14 @@ namespace SimpleMapDemo
                 if (googleMap != null)
                 {
                     var markerOpt1 = new MarkerOptions();
-                    markerOpt1.SetPosition(VimyRidge);
-                    markerOpt1.SetTitle("Vimy Ridge");
-                    markerOpt1.InvokeIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueCyan));
+                    markerOpt1.SetPosition(VimyRidge)
+                              .SetTitle("Vimy Ridge")
+                              .SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueCyan));
                     googleMap.AddMarker(markerOpt1);
 
                     var markerOpt2 = new MarkerOptions();
-                    markerOpt2.SetPosition(Passchendaele);
-                    markerOpt2.SetTitle("Passchendaele");
+                    markerOpt2.SetPosition(Passchendaele)
+                              .SetTitle("Passchendaele");
                     googleMap.AddMarker(markerOpt2);
 
                     // We create an instance of CameraUpdate, and move the map to it.

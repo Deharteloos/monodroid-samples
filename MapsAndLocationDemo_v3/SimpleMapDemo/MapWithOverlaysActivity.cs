@@ -2,6 +2,7 @@ using Android.App;
 using Android.Gms.Maps;
 using Android.Gms.Maps.Model;
 using Android.OS;
+using Android.Support.V7.App;
 using Android.Widget;
 
 namespace SimpleMapDemo
@@ -9,7 +10,7 @@ namespace SimpleMapDemo
     using System;
 
     [Activity(Label = "@string/activity_label_mapwithoverlays")]
-    public class MapWithOverlaysActivity : Activity, IOnMapReadyCallback
+    public class MapWithOverlaysActivity : AppCompatActivity, IOnMapReadyCallback
     {
         static readonly LatLng InMaui = new LatLng(20.72110, -156.44776);
         static readonly LatLng LeaveFromHereToMaui = new LatLng(82.4986, -62.348);
@@ -90,9 +91,9 @@ namespace SimpleMapDemo
                 var icon = BitmapDescriptorFactory.FromResource(Resource.Drawable.monkey);
                 var markerOptions = new MarkerOptions()
                                     .SetPosition(LocationForCustomIconMarkers[i])
-                                    .InvokeIcon(icon)
-                                    .SetSnippet(string.Format("This is marker #{0}.", i))
-                                    .SetTitle(string.Format("Marker {0}", i));
+                                    .SetIcon(icon)
+                                    .SetSnippet($"This is marker #{i}.")
+                                    .SetTitle($"Marker {i}");
                 _map.AddMarker(markerOptions);
             }
         }

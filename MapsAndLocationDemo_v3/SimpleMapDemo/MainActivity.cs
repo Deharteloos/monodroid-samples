@@ -69,33 +69,35 @@ namespace SimpleMapDemo
         protected override void OnResume()
         {
             base.OnResume();
-            listView.Click += SampleSelected;
+            listView.ItemClick += SampleSelected;
         }
 
-        void SampleSelected(object sender, EventArgs e)
+        void SampleSelected(object sender, AdapterView.ItemClickEventArgs e)
         {
-//            if (position == 0)
-//            {
-//                var geoUri = AndroidUri.Parse("geo:42.374260,-71.120824");
-//                var mapIntent = new Intent(Intent.ActionView, geoUri);
-//                StartActivity(mapIntent);
-//                return;
-//            }
-//
-//            var activity = SampleMetaDataList[position];
-//            activity.Start(this);
+            var position = e.Position;
+            if (position == 0)
+            {
+                var geoUri = AndroidUri.Parse("geo:42.374260,-71.120824");
+                var mapIntent = new Intent(Intent.ActionView, geoUri);
+                StartActivity(mapIntent);
+                return;
+            }
+
+
+            var sampleToStart = SampleMetaDataList[position];
+            sampleToStart.Start(this);
         }
 
         protected override void OnPause()
         {
-            listView.Click -= SampleSelected;
+            listView.ItemClick -= SampleSelected;
             base.OnPause();
         }
 
 
         void InitializeListView()
         {
-            listView = FindViewById<ListView>(Resource.Id.list_view);
+            listView = FindViewById<ListView>(Resource.Id.listView);
             if (isGooglePlayServicesInstalled)
             {
                 listAdapter = new SamplesListAdapter(this, SampleMetaDataList);
@@ -106,7 +108,7 @@ namespace SimpleMapDemo
                 listAdapter = new SamplesListAdapter(this, null);
             }
 
-//            listView.Adapter = listAdapter;
+            listView.Adapter = listAdapter;
         }
 
         bool TestIfGooglePlayServicesIsInstalled()
