@@ -1,3 +1,5 @@
+using System;
+
 using Android.App;
 using Android.Gms.Maps;
 using Android.Gms.Maps.Model;
@@ -10,14 +12,16 @@ namespace SimpleMapDemo
     [Activity(Label = "@string/activity_label_mapwithmarkers")]
     public class MapWithMarkersActivity : AppCompatActivity, IOnMapReadyCallback
     {
-        static readonly LatLng Passchendaele = new LatLng(50.897778, 3.013333);
-        static readonly LatLng VimyRidge = new LatLng(50.379444, 2.773611);
+        static readonly LatLng PasschendaeleLatLng = new LatLng(50.897778, 3.013333);
+        static readonly LatLng VimyRidgeLatLng = new LatLng(50.379444, 2.773611);
+        Button animateToLocationButton;
         GoogleMap googleMap;
-        MapFragment mapFragment;
 
         public void OnMapReady(GoogleMap map)
         {
             googleMap = map;
+            AddMarkersToMap();
+            animateToLocationButton.Click += AnimateToPasschendaele;
         }
 
         protected override void OnCreate(Bundle bundle)
@@ -25,80 +29,47 @@ namespace SimpleMapDemo
             base.OnCreate(bundle);
             SetContentView(Resource.Layout.MapLayout);
 
-            InitMapFragment();
+            var mapFragment = (SupportMapFragment) SupportFragmentManager.FindFragmentById(Resource.Id.map);
+            mapFragment.GetMapAsync(this);
 
-            SetupAnimateToButton();
+            animateToLocationButton = FindViewById<Button>(Resource.Id.animateButton);
+            animateToLocationButton.Click += AnimateToPasschendaele;
+
             SetupZoomInButton();
             SetupZoomOutButton();
         }
 
-        protected override void OnResume()
+        void AnimateToPasschendaele(object sender, EventArgs e)
         {
-            base.OnResume();
-            SetupMapIfNeeded();
+            // Move the camera to the PasschendaeleLatLng Memorial in Belgium.
+            var builder = CameraPosition.InvokeBuilder();
+            builder.Target(PasschendaeleLatLng);
+            builder.Zoom(18);
+            builder.Bearing(155);
+            builder.Tilt(65);
+            var cameraPosition = builder.Build();
+
+            // AnimateCamera provides a smooth, animation effect while moving
+            // the camera to the the position.
+            googleMap.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cameraPosition));
         }
 
-        void InitMapFragment()
+        void AddMarkersToMap()
         {
-            mapFragment = FragmentManager.FindFragmentByTag("map") as MapFragment;
-            if (mapFragment == null)
-            {
-                var mapOptions = new GoogleMapOptions()
-                                 .InvokeMapType(GoogleMap.MapTypeSatellite)
-                                 .InvokeZoomControlsEnabled(false)
-                                 .InvokeCompassEnabled(true);
+            var vimyMarker = new MarkerOptions();
+            vimyMarker.SetPosition(VimyRidgeLatLng)
+                      .SetTitle("Vimy Ridge")
+                      .SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueCyan));
+            googleMap.AddMarker(vimyMarker);
 
-                var fragTx = FragmentManager.BeginTransaction();
-                mapFragment = MapFragment.NewInstance(mapOptions);
-                fragTx.Add(Resource.Id.map, mapFragment, "map");
-                fragTx.Commit();
-            }
+            var passchendaeleMarker = new MarkerOptions();
+            passchendaeleMarker.SetPosition(PasschendaeleLatLng)
+                               .SetTitle("PasschendaeleLatLng");
+            googleMap.AddMarker(passchendaeleMarker);
 
-            mapFragment.GetMapAsync(this);
-        }
-
-        void SetupAnimateToButton()
-        {
-            var animateButton = FindViewById<Button>(Resource.Id.animateButton);
-            animateButton.Click += (sender, e) =>
-                                   {
-                                       // Move the camera to the Passchendaele Memorial in Belgium.
-                                       var builder = CameraPosition.InvokeBuilder();
-                                       builder.Target(Passchendaele);
-                                       builder.Zoom(18);
-                                       builder.Bearing(155);
-                                       builder.Tilt(65);
-                                       var cameraPosition = builder.Build();
-
-                                       // AnimateCamera provides a smooth, animation effect while moving
-                                       // the camera to the the position.
-
-                                       googleMap.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cameraPosition));
-                                   };
-        }
-
-        void SetupMapIfNeeded()
-        {
-            if (googleMap == null)
-            {
-                if (googleMap != null)
-                {
-                    var markerOpt1 = new MarkerOptions();
-                    markerOpt1.SetPosition(VimyRidge)
-                              .SetTitle("Vimy Ridge")
-                              .SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueCyan));
-                    googleMap.AddMarker(markerOpt1);
-
-                    var markerOpt2 = new MarkerOptions();
-                    markerOpt2.SetPosition(Passchendaele)
-                              .SetTitle("Passchendaele");
-                    googleMap.AddMarker(markerOpt2);
-
-                    // We create an instance of CameraUpdate, and move the map to it.
-                    var cameraUpdate = CameraUpdateFactory.NewLatLngZoom(VimyRidge, 15);
-                    googleMap.MoveCamera(cameraUpdate);
-                }
-            }
+            // We create an instance of CameraUpdate, and move the map to it.
+            var cameraUpdate = CameraUpdateFactory.NewLatLngZoom(VimyRidgeLatLng, 15);
+            googleMap.MoveCamera(cameraUpdate);
         }
 
         void SetupZoomInButton()
